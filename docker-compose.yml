@@ -1,0 +1,50 @@
+version: '2.3'
+
+services:
+    postgres:
+        image: postgres:12
+        networks:
+            - nest_network
+        ports:
+            - 5432:5432
+        volumes:
+            - nest_udemy_data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_USER=pgadmin
+            - POSTGRES_PASSWORD=devPassword123!
+            - POSTGRES_DB=nestudemydb
+    pgadmin:
+        container_name: pgadmin_container
+        image: dpage/pgadmin4
+        depends_on:
+            - postgres
+        environment:
+            PGADMIN_DEFAULT_EMAIL: no-reply@no-reply.no-reply.com
+            PGADMIN_DEFAULT_PASSWORD: admin
+        volumes:
+            - pgadmin:/root/.pgadmin
+        ports:
+            - 5050:80
+        networks:
+            - nest_network
+    nest_server:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        command: nest start --watch
+        networks:
+            - nest_network
+        depends_on:
+            - postgres
+        ports:
+            - 3000:3000
+        volumes:
+            - .:/opt/node/app:delegated
+            - ./package.json:/opt/node/package.json
+            - notused:/opt/node/node_modules
+volumes:
+    nest_udemy_data:
+    notused:
+    pgadmin:
+networks:
+    nest_network:

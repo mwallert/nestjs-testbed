@@ -1,0 +1,20 @@
+FROM node:12.16
+
+ARG NODE_ENV=development
+
+RUN npm i npm@latest -g
+
+RUN npm i nodemon -g
+
+RUN mkdir /opt/node && chown node:node /opt/node
+WORKDIR /opt/node
+
+COPY ./package.json ./package-lock.json* ./
+RUN npm install --no-optional && npm cache clean --force
+ENV PATH /opt/node/node_modules/.bin:$PATH
+
+WORKDIR /opt/node/app
+
+USER node
+
+COPY ./ /opt/node/app
