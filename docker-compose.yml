@@ -22,7 +22,7 @@ services:
             PGADMIN_DEFAULT_EMAIL: no-reply@no-reply.no-reply.com
             PGADMIN_DEFAULT_PASSWORD: admin
         volumes:
-            - pgadmin:/root/.pgadmin
+            - pgadmin:/var/lib/pgadmin
         ports:
             - 5050:80
         networks:
