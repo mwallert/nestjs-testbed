@@ -1,18 +1,47 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { TasksService } from './tasks.service';
+import { TaskRepository } from './task.repository';
+import { GetTasksFilterDto } from './dto/get-tasks-filter.dto';
+import { TaskStatus } from './task-status.enum';
 
-describe('TasksService', () => {
-  let service: TasksService;
+const mockUser = { username: 'Michael' };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [TasksService],
-    }).compile();
+const mockTaskRepository = () => ({
+    getTasks: jest.fn(),
+});
 
-    service = module.get<TasksService>(TasksService);
-  });
+describe('TaskService', () => {
+    let tasksService,
+        taskRepository;
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+    beforeEach(async () => {
+        const module = await Test.createTestingModule({
+            providers: [
+                {
+                    provide: TaskRepository,
+                    useFactory: mockTaskRepository
+                },
+                TasksService,
+            ],
+        }).compile();
+
+        tasksService = await module.get<TasksService>(TasksService);
+        taskRepository = await module.get<TaskRepository>(TaskRepository);
+    });
+
+    describe('getTasks', () => {
+        it('gets all tasks from the repository', async () => {
+            taskRepository.getTasks.mockResolvedValue('someValue');
+
+            expect(taskRepository.getTasks).not.toHaveBeenCalled();
+
+            const filters: GetTasksFilterDto = { status: TaskStatus.IN_PROGRESS, search: 'Test'};
+
+            const allTasks = await tasksService.getTasks(filters, mockUser);
+
+            expect(taskRepository.getTasks).toHaveBeenCalled();
+
+            expect(allTasks).toEqual('someValue');
+        });
+    });
 });
