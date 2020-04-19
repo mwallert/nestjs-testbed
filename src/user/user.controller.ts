@@ -4,9 +4,10 @@ import { GameUser } from './game-user.entity';
 import { GameUserRepository } from './user.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './create-user.dto';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('users')
-export class UserController extends BaseController<GameUser> {
+export class UserController extends BaseController<GameUser, CreateUserDto> {
     constructor(
         @InjectRepository(GameUserRepository)
         public userRepository: GameUserRepository
@@ -14,6 +15,7 @@ export class UserController extends BaseController<GameUser> {
         super(userRepository);
     }
 
+    @ApiBody({ type: CreateUserDto })
     @Post()
     createUser(
         @Body() createUserDto: CreateUserDto

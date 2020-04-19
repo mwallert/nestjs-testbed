@@ -3,7 +3,10 @@ import { Repository } from "typeorm";
 import { BaseModel } from "./base.entity";
 
 import * as _ from 'lodash';
+import { ApiTags, ApiExtraModels, ApiBody, ApiProduces, ApiResponse } from "@nestjs/swagger";
+import { CreateUserDto } from "src/user/create-user.dto";
 
+@ApiTags('Users')
 export class BaseController<T extends BaseModel, DTO = {}> {
     propsMap: string[];
     repository: Repository<T>;
@@ -16,15 +19,17 @@ export class BaseController<T extends BaseModel, DTO = {}> {
         this.propsMap = Object.keys(this.repository.metadata.propertiesMap);
     }
 
+    @ApiResponse({
+        status: 200,
+        type: CreateUserDto,
+        isArray: true
+    })
     @Get()
     getAll(): Promise<T[]> {
         return this.repository.find({deleted_at: null});
     }
 
-    @Post()
-    create(
-        @Body() body: T | DTO,
-    ): Promise<T> {
+    create(body: DTO | T): Promise<T> {
         const newRecord = this.repository.create();
 
         this.mergeData(newRecord, body);

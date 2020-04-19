@@ -1,14 +1,12 @@
+import { ApiProperty } from "@nestjs/swagger";
+
 export class BaseDto {
-    constructor(base, values) {
-        this.pickValues(base, values);
-    }
+    @ApiProperty()
+    id: number;
 
-    pickValues(base, values) {
-        console.log(base);
-        for (let key in base) {
-            base[key] = values[key];
-        }
+    @ApiProperty({ nullable: true })
+    deleted_at: Date;
 
-        return base;
-    }
+    @ApiProperty({ nullable: true })
+    deleted_by: string;
 }
